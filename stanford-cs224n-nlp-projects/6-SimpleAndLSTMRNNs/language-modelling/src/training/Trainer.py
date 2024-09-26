@@ -39,41 +39,6 @@ class Trainer:
         with open(self.log_file, 'w') as f:
             json.dump([], f)
 
-    # def train_one_epoch(self, epoch):
-    #     self.model.train()
-    #     total_loss = 0
-    #     num_batches = len(self.train_dl)
-    #     progress_bar = tqdm(self.train_dl, desc=f"Epoch {epoch}", leave=False)
-    #     for batch_idx, (inputs, targets) in enumerate(progress_bar):
-    #         inputs, targets = inputs.to(self.device), targets.to(self.device)
-
-    #         self.optimizer.zero_grad()
-
-    #         outputs = self.model(inputs)
-    #         print(f"outputs shape: {outputs.shape}")
-           
-    #         if self.teacher_forcing and torch.rand(1).item() < self.teacher_forcing_ratio:
-    #             targets_for_loss = targets[:, 1:] # Use the actual previous target for teacher forcing
-    #             targets_for_loss = targets_for_loss.float()
-    #             print(f"targets_for_loss shape: {targets_for_loss.shape}")
-    #         else: 
-    #             targets_for_loss = outputs
-
-    #         targets = targets[:,-1]
-
-    #         loss = self.criterion(targets_for_loss, targets)
-    #         total_loss += loss.item()
-
-    #         loss.backward()
-    #         clip_grad_norm_(self.model.parameters(), max_norm=1.0)
-
-    #         self.optimizer.step()
-
-    #     avg_loss = total_loss / (batch_idx + 1)
-    #     perplexity = math.exp(avg_loss) if avg_loss < 300 else float('inf')  # Safeguard for overflow
-    #     progress_bar.set_postfix(loss=avg_loss, perplexity=perplexity)
-
-    #     return avg_loss, perplexity
     def train_one_epoch(self, epoch):
         self.model.train()
         total_loss = 0
