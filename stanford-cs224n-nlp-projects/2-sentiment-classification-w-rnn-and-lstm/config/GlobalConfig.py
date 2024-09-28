@@ -1,0 +1,10 @@
+EMBEDDING_DIM = 50
+HIDDEN_DIM = 128
+BATCH_SIZE = 32
+SEQ_LEN = 15
+DATASET_FILE_PATH = "../dataset/IMDB_Dataset.csv"
+GLOBAL_CHECKPOINT_DIR = "../outputs/model_checkpoints"
+GLOBAL_LOG_FILE_DIR="../outputs/logs"
+CHECKPOINT_INTERVAL = 25
+LR = 1e-4
+GRAPH_DIR = "../outputs/training_graphs"
