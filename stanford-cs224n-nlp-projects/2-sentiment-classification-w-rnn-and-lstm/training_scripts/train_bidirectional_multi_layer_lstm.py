@@ -27,6 +27,7 @@ if __name__ == '__main__':
     criterion = nn.CrossEntropyLoss()
     trainer = Trainer(model=model,
                       train_dl=train_dl,
+                      test_dl=test_dl,
                       criterion=criterion, 
                       optimizer=optimizer, 
                       device=device,
