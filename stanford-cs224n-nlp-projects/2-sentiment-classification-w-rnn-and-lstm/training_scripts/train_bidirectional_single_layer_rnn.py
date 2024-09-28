@@ -35,6 +35,8 @@ if __name__ == '__main__':
                       checkpoint_dir=CHECKPOINT_DIR,
                       log_file=LOG_FILE_PATH,
                       save_interval=CHECKPOINT_INTERVAL,
+                      is_preload=IS_PRELOAD,
+                      preload_path=PRELOAD_CHECKPOINT_PATH
                       )
 
     trainer.train(NUM_EPOCHS)
