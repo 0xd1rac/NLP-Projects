@@ -25,6 +25,7 @@ class Trainer:
         self.best_loss = float('inf')
         self.log_file = log_file
         self.save_interval = save_interval
+        model.to(device)
 
         os.makedirs(self.checkpoint_dir, exist_ok=True)
 
