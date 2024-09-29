@@ -35,31 +35,3 @@ We evaluated the models based on the following performance metrics:
 | Bidirectional Multi-Layer LSTM   | 91.20%   | 91.10%    | 91.15% | 91.12%   |
 
 The **Bidirectional Multi-Layer LSTM** achieved the best overall performance, with an accuracy of **91.20%** and an F1-Score of **91.12%**.
-
-## Training and Validation Curves
-
-During training, we track the following curves to monitor performance over epochs:
-
-- **Accuracy** over training and validation datasets
-- **Loss** over training and validation datasets
-- **Precision** over epochs
-- **Recall** over epochs
-- **F1-Score** over epochs
-
-Plotting these curves allows us to visually assess model convergence and overfitting.
-
-Example of plotting training metrics:
-
-```python
-import matplotlib.pyplot as plt
-
-def plot_metrics(history):
-    metrics = ['accuracy', 'loss', 'precision', 'recall', 'f1_score']
-    for metric in metrics:
-        plt.plot(history.history[metric], label=f'training {metric}')
-        plt.plot(history.history[f'val_{metric}'], label=f'validation {metric}')
-        plt.title(f'Model {metric.capitalize()}')
-        plt.xlabel('Epochs')
-        plt.ylabel(metric.capitalize())
-        plt.legend()
-        plt.show()

@@ -1,1 +1,3 @@
 venv
+*pycache*
+*DS_Store*
