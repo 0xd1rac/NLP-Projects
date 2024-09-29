@@ -1,8 +1,8 @@
 import torch.nn as nn
 import torch
-import DecoderGRU as DecoderGRU
-import EncoderBiDirGRU as EncoderBiDirGRU
-from Attention import Attention
+from .DecoderGRU import DecoderGRU
+from .EncoderBiDirGRU import EncoderBiDirGRU
+from .Attention import Attention
 
 class Seq2Seq(nn.Module):
     def __init__(self, 

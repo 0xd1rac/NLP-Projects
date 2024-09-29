@@ -17,9 +17,9 @@ class Seq2SeqTrainer:
                  checkpoint_dir,
                  log_file,
                  save_interval,
-                 src_pad_idx,
-                 trg_pad_idx,
-                 trg_vocab,
+                 src_token_2_idx,
+                 tgt_token_2_idx,
+                 tgt_idx_2_token,
                  clip_grad=1.0,
                  teacher_forcing_ratio=0.5,
                  is_preload=False,     
@@ -36,9 +36,11 @@ class Seq2SeqTrainer:
         self.save_interval = save_interval
         self.teacher_forcing_ratio = teacher_forcing_ratio
         self.clip_grad = clip_grad
-        self.src_pad_idx = src_pad_idx
-        self.trg_pad_idx = trg_pad_idx
-        self.trg_vocab = trg_vocab  # Needed for decoding indices to words
+        # self.src_pad_idx = src_pad_idx
+        # self.trg_pad_idx = trg_pad_idx
+        self.src_token_2_idx = src_token_2_idx
+        self.tgt_token_2_idx = tgt_token_2_idx  # Needed for decoding indices to words
+        self.tgt_idx_2_token = tgt_idx_2_token
         
         model.to(device)
 
@@ -74,10 +76,20 @@ class Seq2SeqTrainer:
         for batch_idx, (src, trg) in enumerate(progress_bar):
             src, trg = src.to(self.device), trg.to(self.device)
 
+            # Debug: Check if there are out-of-bound indices
+            # print(f"Max index in src: {src.max().item()}, Src vocab size: {len(self.src_token_2_idx)}")
+            # print(f"Max index in trg: {trg.max().item()}, Trg vocab size: {len(self.tgt_token_2_idx)}")
             self.optimizer.zero_grad()
 
             # Forward pass
-            output = self.model(src, trg, teacher_forcing_ratio=self.teacher_forcing_ratio)
+             # Forward pass
+            try:
+                output = self.model(src, trg, teacher_forcing_ratio=self.teacher_forcing_ratio)
+            except IndexError as e:
+                print(f"Index error: {e}")
+                print(f"Src max index: {src.max().item()}, Trg max index: {trg.max().item()}")
+                raise  # Re-raise the error to halt execution
+
             # trg shape: [batch_size, trg_len]
             # output shape: [batch_size, trg_len, output_dim]
 
@@ -128,23 +140,46 @@ class Seq2SeqTrainer:
         avg_bleu = total_bleu / num_batches
         return avg_loss, avg_bleu
 
-    def decode_batch(self, batch, is_reference=False):
+    def decode_batch(self, batch, is_reference=False, batch_size=None, seq_len=None):
         """
-        Converts a batch of word indices into human-readable token sequences.
+        Decodes a batch of token indices or logits into human-readable tokens.
+        Args:
+            batch: Tensor. If `is_reference` is False, this is the model's output logits. 
+                If `is_reference` is True, this is the target tensor (indices).
+            is_reference: If True, the input is the reference (ground truth) indices.
+                        If False, the input is the model's output (logits).
+            batch_size: If the batch has been flattened, provide the batch size to reshape.
+            seq_len: If the batch has been flattened, provide the sequence length to reshape.
+        Returns:
+            List of decoded token sentences.
         """
         decoded_sentences = []
-        for i in range(batch.shape[0]):  # iterate through each sentence in batch
-            sentence = []
-            for idx in batch[i]:
-                if is_reference:
-                    word = self.trg_vocab.get_itos()[idx]  # Reference decoding (no <unk>)
-                else:
-                    word = self.trg_vocab.get_itos()[idx.item()]  # Prediction decoding
-                if word == "<eos>":  # End of sequence token
-                    break
-                sentence.append(word)
-            decoded_sentences.append(sentence)
+
+        # Handle reference (ground truth)
+        if is_reference:
+            for sentence_indices in batch:
+                sentence = [self.tgt_idx_2_token[idx.item()] for idx in sentence_indices]  # Convert indices to tokens
+                decoded_sentences.append(sentence)
+        else:
+            # If the batch is flattened, reshape it back to [batch_size, seq_len, vocab_size]
+            if len(batch.shape) == 2 and batch_size is not None and seq_len is not None:
+                batch = batch.view(batch_size, seq_len, -1)  # Reshape to [batch_size, seq_len, vocab_size]
+            
+            # Check if the batch has 3 dimensions (logits) or 2 dimensions (already token indices)
+            if len(batch.shape) == 3:  # [batch_size, seq_len, vocab_size]
+                # Apply argmax to get predicted token indices
+                predicted_indices = torch.argmax(batch, dim=2)  # [batch_size, seq_len]
+            else:
+                # If it's already token indices
+                predicted_indices = batch  # [batch_size, seq_len]
+            
+            # Convert indices to tokens
+            for sentence_indices in predicted_indices:
+                sentence = [self.tgt_idx_2_token[idx.item()] for idx in sentence_indices]  # Convert indices to tokens
+                decoded_sentences.append(sentence)
+
         return decoded_sentences
+
 
     def calculate_bleu(self, predicted_sentences, reference_sentences):
         """
@@ -152,8 +187,17 @@ class Seq2SeqTrainer:
         """
         bleu_scores = []
         for pred, ref in zip(predicted_sentences, reference_sentences):
-            bleu_scores.append(sentence_bleu([ref], pred, weights=(0.25, 0.25, 0.25, 0.25)))
+            # Remove padding, <sos>, <eos> tokens from both predicted and reference sentences
+            pred = [token for token in pred if token not in ['<pad>', '<sos>', '<eos>']]
+            ref = [token for token in ref if token not in ['<pad>', '<sos>', '<eos>']]
+            
+            if len(pred) > 0 and len(ref) > 0:  # Avoid empty sequences
+                bleu_scores.append(sentence_bleu([ref], pred, weights=(0.25, 0.25, 0.25, 0.25)))
+
+        if len(bleu_scores) == 0:
+            return 0
         return sum(bleu_scores) / len(bleu_scores)
+
 
     def save_checkpoint(self, epoch, current_loss, current_bleu):
         checkpoint_path = os.path.join(self.checkpoint_dir, f"checkpoint_epoch_{epoch}.pth")

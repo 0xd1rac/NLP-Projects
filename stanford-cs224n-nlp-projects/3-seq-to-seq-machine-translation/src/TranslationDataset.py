@@ -9,10 +9,10 @@ spacy_de = spacy.load('de_core_news_sm')
 spacy_en = spacy.load('en_core_web_sm')
 
 def tokenize_de(text):
-    return [tok.text for tok in spacy_de.tokenizer(text)]
+    return [tok.text.lower() for tok in spacy_de.tokenizer(text)]
 
 def tokenize_en(text):
-    return [tok.text for tok in spacy_en.tokenizer(text)]
+    return [tok.text.lower() for tok in spacy_en.tokenizer(text)]
 
 def read_csv_data(file_path):
     src_sentences = []
@@ -42,14 +42,13 @@ def build_vocab(tokenized_sentences, min_freq=2):
 
 # Convert tokenized sentence to tensor of word indices
 def sentence_to_tensor(sentence, token_2_idx):
-    # .get(token, token_2_idx['unk]) 
-        # if token exists in token_2_idx, return the idx for the token
-        # if token doesn't exist, return returns the idx of <unk> token
-    return torch.tensor(
-        [token_2_idx.get(token, token_2_idx['<unk>']) for token in sentence],
-        dtype=torch.long
-    )
-
+    tensor = []
+    for token in sentence:
+        idx = token_2_idx.get(token, token_2_idx['<unk>'])
+        tensor.append(idx)
+        # if idx == token_2_idx['<unk>']:
+        #     print(f"Out-of-vocabulary token: {token}")  # Debugging for OOV tokens
+    return torch.tensor(tensor, dtype=torch.long)
 
 class TranslationDataset(Dataset):
     def __init__(self, 
@@ -78,14 +77,15 @@ class TranslationDataset(Dataset):
         return src_tensor, tgt_tensor
 
 # DataLoader collate function to pad sequences in each batch
-def collate_fn(batch, pad_idx):
+def collate_fn(batch, src_pad_idx, tgt_pad_idx):
     src_batch, tgt_batch = zip(*batch)
 
     # Pad sequences 
-    src_batch_padded = torch.nn.utils.rnn.pad_sequence(src_batch, padding_value=pad_idx, batch_first=True)
-    tgt_batch_padded = torch.nn.utils.rnn.pad_sequence(tgt_batch, padding_value=pad_idx, batch_first=True)
+    src_batch_padded = torch.nn.utils.rnn.pad_sequence(src_batch, padding_value=src_pad_idx, batch_first=True)
+    tgt_batch_padded = torch.nn.utils.rnn.pad_sequence(tgt_batch, padding_value=tgt_pad_idx, batch_first=True)
 
     return src_batch_padded, tgt_batch_padded
+
 
 # save token_2_idx and idx_2_token files 
 def save_file(data_dict, file_path):
@@ -114,8 +114,11 @@ def get_data_loaders(train_file,
     test_tgt_tokenized = [tokenize_en(sent) for sent in test_tgt]
 
     # build mappings 
-    src_token_2_idx, src_idx_2_token = build_vocab(train_src_tokenized)
-    tgt_token_2_idx, tgt_idx_2_token = build_vocab(train_tgt_tokenized)
+    src_token_2_idx, src_idx_2_token = build_vocab(train_src_tokenized, min_freq=1)
+    tgt_token_2_idx, tgt_idx_2_token = build_vocab(train_tgt_tokenized, min_freq=1)
+
+    print(f"[INFO] Source vocabulary size: {len(src_token_2_idx)}")
+    print(f"[INFO] Target vocabulary size: {len(tgt_token_2_idx)}")
 
     # Save token_2_idx and idx_2_token mappings to file
     save_file(src_token_2_idx, f'{vocab_dir}/src_token_2_idx.json')
@@ -128,8 +131,8 @@ def get_data_loaders(train_file,
     val_ds = TranslationDataset(val_src_tokenized,val_tgt_tokenized,src_token_2_idx, tgt_token_2_idx)
     test_ds = TranslationDataset(test_src_tokenized, test_tgt_tokenized, src_token_2_idx, tgt_token_2_idx)
 
-    train_dl = DataLoader(train_ds, batch_size=batch_size, shuffle=True, collate_fn=lambda x: collate_fn(x, src_token_2_idx['<pad>']))
-    val_dl = DataLoader(val_ds, batch_size=batch_size, shuffle=False, collate_fn=lambda x: collate_fn(x, src_token_2_idx['<pad>']))
-    test_dl = DataLoader(test_ds, batch_size=batch_size, shuffle=False, collate_fn=lambda x: collate_fn(x, src_token_2_idx['<pad>']))
+    train_dl = DataLoader(train_ds, batch_size=batch_size, shuffle=True, collate_fn=lambda x: collate_fn(x, src_token_2_idx['<pad>'], tgt_token_2_idx['<pad>']))
+    val_dl = DataLoader(val_ds, batch_size=batch_size, shuffle=False, collate_fn=lambda x: collate_fn(x, src_token_2_idx['<pad>'], tgt_token_2_idx['<pad>']))
+    test_dl = DataLoader(test_ds, batch_size=batch_size, shuffle=False, collate_fn=lambda x: collate_fn(x, src_token_2_idx['<pad>'], tgt_token_2_idx['<pad>']))
 
-    return train_dl, val_dl, test_dl, src_token_2_idx, tgt_token_2_idx
+    return train_dl, val_dl, test_dl, src_token_2_idx, src_idx_2_token, tgt_token_2_idx, tgt_idx_2_token
