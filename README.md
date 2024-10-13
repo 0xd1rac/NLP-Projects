@@ -2,6 +2,7 @@ To Do:
 - [ ]  paper: GPTv1 (decoder)
 - [ ]  paper: GPTv2 (decoder)
 - [ ]  paper: GPTv3 (decoder)
+- [ ]  paper: GPTv4 (decoder)
 - [x]  paper: BERT (encoder)
 - [ ]  paper: RoBERTa (encoder)
 - [ ]  paper: DistilBERT (encoder)
@@ -20,5 +21,11 @@ To Do:
 - [ ]  paper: Switch Transformer
 - [ ]  paper: LLaMA v1
 - [ ]  paper: LLaMA v2
+- [ ]  paper: LLaMA v3
 - [ ]  paper: LLaMA-Adapter
+- [ ]  paper: CodeX
+- [ ]  paper: Mamba
+- [ ]  paper: Mamba v2
+- [ ]  paper: Mistral7B
+- [ ]  paper: RNNs are all you need
 - [ ]  paper: AlphaCode
