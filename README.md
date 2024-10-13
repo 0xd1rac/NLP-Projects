@@ -1,0 +1,21 @@
+To Do:
+- [ ]  paper: GPTv1 (decoder)
+- [ ]  paper: GPTv2 (decoder)
+- [ ]  paper: GPTv3 (decoder)
+- [x]  paper: BERT (encoder)
+- [ ]  paper: RoBERTa (encoder)
+- [ ]  paper: DistilBERT (encoder)
+- [ ]  paper: TinyBERT (encoder)
+- [ ]  paper: BioBERT (encoder)
+- [ ]  paper: ClinicalBERT (encoder)
+- [ ]  paper: mBERT (encoder)
+- [ ]  paper: XLNet (encoder)
+- [ ]  paper: T5 (encoder-decoder)
+- [ ]  paper: BART (encoder-encoder)
+- [ ]  paper: mBART (encoder-decoder)
+- [x]  paper: Attention is All You Need - transformer (encoder-decoder)
+- [ ]  paper: Switch Transformer
+- [ ]  paper: LLaMA v1
+- [ ]  paper: LLaMA v2
+- [ ]  paper: LLaMA-Adapter
+- [ ]  paper: AlphaCode
