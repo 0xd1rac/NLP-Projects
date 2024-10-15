@@ -1,5 +1,5 @@
 To Do:
-- [ ]  paper: GPTv1 (decoder)
+- [x]  paper: GPTv1 (decoder)
 - [ ]  paper: GPTv2 (decoder)
 - [ ]  paper: GPTv3 (decoder)
 - [ ]  paper: GPTv4 (decoder)
