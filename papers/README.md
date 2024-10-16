@@ -4,6 +4,8 @@ This is my feeble attempt at reading and implementing various NLP papers. Mostly
 ## Table of Contents
 - [BERT](#bert)
 - [GPTv1](#gptv1)
+- [GPTv2](#gptv2)
+
 
 ## Bert 
 
