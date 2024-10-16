@@ -1,6 +1,6 @@
 To Do:
 - [x]  paper: GPTv1 (decoder)
-- [ ]  paper: GPTv2 (decoder)
+- [x]  paper: GPTv2 (decoder)
 - [ ]  paper: GPTv3 (decoder)
 - [ ]  paper: GPTv4 (decoder)
 - [x]  paper: BERT (encoder)
