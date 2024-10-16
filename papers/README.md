@@ -10,7 +10,7 @@ This is my feeble attempt at reading and implementing various NLP papers. Mostly
 This implementation of BERT follows the original architecture, consisting of a stack of transformer-based **Encoder Blocks**. Each block contains a **Multi-Head Self-Attention** mechanism followed by a **Feed-Forward Neural Network**, both of which include residual connections and layer normalization. The model uses token, positional, and segment embeddings to handle input sequences, with masking applied for padding tokens.
 
 
-<img src="images/bert.png" alt="BERT Architecture" width="500" height="300">
+<img src="images/bert.png" alt="BERT Architecture" width="700" height="400">
 
 
 ```python
@@ -77,7 +77,7 @@ print(preds.shape) # Output shape: (BATCH_SIZE, SEQ_LEN, VOCAB_SIZE)
 ## GPTv2
 This implementation of GPT-2 builds upon the architecture of GPT-1, with a similar stack of transformer-based Decoder Blocks. Each block contains a Masked Multi-Head Self-Attention mechanism and a Feed-Forward Neural Network, both using pre-activation layer normalization and residual connections. GPT-2 also uses causal masking in the attention mechanism to ensure that tokens can only attend to past and current positions, maintaining the autoregressive nature of the model. The input sequences are represented through learned token and positional embeddings. GPT-2 improves over GPT-1 with an increased context window, larger model size, expanded vocabulary, and more robust training, making it well-suited for a wide range of generative tasks where text is predicted one token at a time based on preceding tokens.
 
-<img src="images/gptv2.png" alt="GPTv2 Architecture" width="500" height="300">
+<img src="images/gptv2.png" alt="GPTv2 Architecture" width="700" height="300">
 
 ```python
 import torch
