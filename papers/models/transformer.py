@@ -164,7 +164,7 @@ class Encoder(nn.Module):
                 src_mask:torch.Tensor=None
                 )-> torch.Tensor:
         seq_len = src.size(1)
-        pos_ids = torch.arange(0, seq_len, d_type=torch.long, device=src.device).unsqueeze(0)
+        pos_ids = torch.arange(0, seq_len, dtype=torch.long, device=src.device).unsqueeze(0)
 
         # token + pos embeddings
         x = self.tok_emb(src) + self.pos_embd(pos_ids)

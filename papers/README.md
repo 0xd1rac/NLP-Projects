@@ -2,14 +2,60 @@
 This is my feeble attempt at reading and implementing various NLP papers. Mostly for educational purposes so.
 
 ## Table of Contents
+- [Transformer](#transformer)
 - [BERT](#bert)
 - [GPTv1](#gptv1)
 - [GPTv2](#gptv2)
 
+## Transformer (Attention is All You Need)
+
+This implementation of the Transformer model follows the original architecture introduced by [Vaswani et al. (2017)](https://arxiv.org/abs/1706.03762), consisting of both **Encoder** and **Decoder** Blocks. Each encoder block contains a **Multi-Head Self-Attention** mechanism followed by a **Feed-Forward Neural Network**, with residual connections and layer normalization applied at each stage. The decoder blocks additionally include a **Cross-Attention** mechanism, which allows the model to attend to the encoder’s output while generating the target sequence. The model uses token and positional embeddings to represent input sequences, and causal masking is applied in the decoder to ensure autoregressive generation for sequence-to-sequence tasks such as machine translation.
+
+<img src="images/transformer.webp" alt="Transformer Architecture" width="400" height="500">
+
+
+
+```python
+import torch
+from models.transformer import Transformer  # assuming you've defined GPTv2 correctly
+
+# Define constants
+SRC_VOCAB_SIZE = 1000
+TGT_VOCAB_SIZE = 1000
+D_MODEL = 768
+NUM_LAYERS = 6
+NUM_HEADS = 12
+D_FF = 2048
+SEQ_LEN = 64
+BATCH_SIZE = 32
+MAX_SEQ_LEN = 100  # Maximum sequence length for positional embeddings
+
+# Initialize the Transformer model
+model = Transformer(
+    src_vocab_size=SRC_VOCAB_SIZE, 
+    tgt_vocab_size=TGT_VOCAB_SIZE, 
+    n_embd=D_MODEL,
+    n_layer=NUM_LAYERS,
+    n_head=NUM_HEADS,
+    d_ff=D_FF,
+    max_seq_len=MAX_SEQ_LEN
+)
+
+# Create dummy input data: random token IDs within the range [0, SRC_VOCAB_SIZE-1] and [0, TGT_VOCAB_SIZE-1]
+src_dummy_data = torch.randint(0, SRC_VOCAB_SIZE, (BATCH_SIZE, SEQ_LEN))  # Source input data
+tgt_dummy_data = torch.randint(0, TGT_VOCAB_SIZE, (BATCH_SIZE, SEQ_LEN))  # Target input data
+
+# Forward pass: generate predictions
+preds = model(src_dummy_data, tgt_dummy_data)
+
+# Output predictions shape (should match batch size, sequence length, and target vocabulary size)
+print(preds.shape)  # Output shape: (BATCH_SIZE, SEQ_LEN, TGT_VOCAB_SIZE)
+```
+
 
 ## Bert 
 
-This implementation of BERT follows the original architecture, consisting of a stack of transformer-based **Encoder Blocks**. Each block contains a **Multi-Head Self-Attention** mechanism followed by a **Feed-Forward Neural Network**, both of which include residual connections and layer normalization. The model uses token, positional, and segment embeddings to handle input sequences, with masking applied for padding tokens.
+This implementation of BERT, as introduced by Jacob Devlin et al. in their paper [BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding](https://arxiv.org/abs/1810.04805), follows the original architecture, consisting of a stack of transformer-based **Encoder Blocks**. Each block contains a **Multi-Head Self-Attention** mechanism followed by a **Feed-Forward Neural Network**, both of which include residual connections and layer normalization. The model uses token, positional, and segment embeddings to handle input sequences, with masking applied for padding tokens.
 
 
 <img src="images/bert.png" alt="BERT Architecture" width="700" height="400">
