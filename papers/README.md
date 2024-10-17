@@ -11,8 +11,9 @@ This is my feeble attempt at reading and implementing various NLP papers. Mostly
 
 This implementation of the Transformer model follows the original architecture introduced by [Vaswani et al. (2017)](https://arxiv.org/abs/1706.03762), consisting of both **Encoder** and **Decoder** Blocks. Each encoder block contains a **Multi-Head Self-Attention** mechanism followed by a **Feed-Forward Neural Network**, with residual connections and layer normalization applied at each stage. The decoder blocks additionally include a **Cross-Attention** mechanism, which allows the model to attend to the encoder’s output while generating the target sequence. The model uses token and positional embeddings to represent input sequences, and causal masking is applied in the decoder to ensure autoregressive generation for sequence-to-sequence tasks such as machine translation.
 
-<img src="images/transformer.webp" alt="Transformer Architecture" width="400" height="500">
-
+<p align="center">
+  <img src="images/transformer.webp" alt="Transformer Architecture" width="300" height="400" />
+</p>
 
 
 ```python
@@ -57,8 +58,10 @@ print(preds.shape)  # Output shape: (BATCH_SIZE, SEQ_LEN, TGT_VOCAB_SIZE)
 
 This implementation of BERT, as introduced by Jacob Devlin et al. in their paper [BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding](https://arxiv.org/abs/1810.04805), follows the original architecture, consisting of a stack of transformer-based **Encoder Blocks**. Each block contains a **Multi-Head Self-Attention** mechanism followed by a **Feed-Forward Neural Network**, both of which include residual connections and layer normalization. The model uses token, positional, and segment embeddings to handle input sequences, with masking applied for padding tokens.
 
+<p align="center">
+  <img src="images/bert.png" alt="BERT Architecture" width="400" height="300" />
+</p>
 
-<img src="images/bert.png" alt="BERT Architecture" width="700" height="400">
 
 
 ```python
@@ -97,7 +100,10 @@ print(preds.shape) # Output shape: (BATCH_SIZE, SEQ_LEN, D_MODEL)
 ## GPTv1
 This implementation of GPT-1 follows the original architecture, consisting of a stack of transformer-based **Decoder Blocks**. Each block contains a **Masked Multi-Head Self-Attention** mechanism, followed by a **Feed-Forward Neural Network**, both of which include residual connections and layer normalization. Unlike bidirectional models, GPT-1 uses causal masking in the attention mechanism to prevent tokens from attending to future positions. The model employs token and positional embeddings to represent input sequences, and it is designed primarily for generative tasks, where each token is predicted autoregressively based on previous context.
 
-<img src="images/gptv1.ppm" alt="GPTv1 Architecture" width="200" height="300">
+<p align="center">
+  <img src="images/gptv1.ppm" alt="GPTv1 Architecture" width="200" height="330" />
+</p>
+
 
 ```python
 import torch
@@ -125,7 +131,10 @@ print(preds.shape) # Output shape: (BATCH_SIZE, SEQ_LEN, VOCAB_SIZE)
 ## GPTv2
 This implementation of GPT-2 builds upon the architecture of GPT-1, with a similar stack of transformer-based Decoder Blocks. Each block contains a Masked Multi-Head Self-Attention mechanism and a Feed-Forward Neural Network, both using pre-activation layer normalization and residual connections. GPT-2 also uses causal masking in the attention mechanism to ensure that tokens can only attend to past and current positions, maintaining the autoregressive nature of the model. The input sequences are represented through learned token and positional embeddings. GPT-2 improves over GPT-1 with an increased context window, larger model size, expanded vocabulary, and more robust training, making it well-suited for a wide range of generative tasks where text is predicted one token at a time based on preceding tokens.
 
-<img src="images/gptv2.png" alt="GPTv2 Architecture" width="700" height="300">
+
+<p align="center">
+  <img src="images/gptv2.png" alt="GPTv2 Architecture" width="500" height="300" />
+</p>
 
 ```python
 import torch
