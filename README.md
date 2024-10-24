@@ -1,31 +1,48 @@
-To Do:
-- [x]  paper: GPTv1 (decoder)
-- [x]  paper: GPTv2 (decoder)
-- [ ]  paper: GPTv3 (decoder)
-- [ ]  paper: GPTv4 (decoder)
-- [x]  paper: BERT (encoder)
-- [ ]  paper: RoBERTa (encoder)
-- [ ]  paper: DistilBERT (encoder)
-- [ ]  paper: TinyBERT (encoder)
-- [ ]  paper: BioBERT (encoder)
-- [ ]  paper: ClinicalBERT (encoder)
-- [ ]  paper: SciBERT (encoder)
-- [ ]  paper: mBERT (encoder)
-- [ ]  paper: XLNet (encoder)
-- [ ]  paper: T5 (encoder-decoder)
-- [ ]  paper: mT5 (encoder-decoder)
-- [ ]  paper: ByT5 (Byte-level T5)
-- [ ]  paper: BART (encoder-encoder)
-- [ ]  paper: mBART (encoder-decoder)
-- [x]  paper: Attention is All You Need - transformer (encoder-decoder)
-- [ ]  paper: Switch Transformer
-- [ ]  paper: LLaMA v1
-- [ ]  paper: LLaMA v2
-- [ ]  paper: LLaMA v3
-- [ ]  paper: LLaMA-Adapter
-- [ ]  paper: CodeX
-- [ ]  paper: Mamba
-- [ ]  paper: Mamba v2
-- [ ]  paper: Mistral7B
-- [ ]  paper: RNNs are all you need
-- [ ]  paper: AlphaCode
+# LLM Papers
+
+## Encoder Networks
+- [ ] BERT
+- [ ] RoBERTa
+- [ ] DistilBERT
+- [ ] TinyBERT
+- [ ] BioBERT
+- [ ] ClinicalBERT
+- [ ] ALBERT
+- [ ] SciBERT
+- [ ] mBERT
+- [ ] XLNet
+
+## Decoder Networks
+- [ ] GPTv1
+- [ ] GPTv2
+- [ ] GPTv3
+- [ ] GPTv4
+
+## Encoder-Decoder Networks
+- [ ] T5
+- [ ] mT5
+- [ ] ByT5
+- [ ] BART
+- [ ] mBART
+- [ ] Attention is All You Need (Transformer)
+- [ ] Switch Transformer
+- [ ] LLaMA v1
+- [ ] LLaMA v2
+- [ ] LLaMA v3
+- [ ] LLaMA-Adapter
+- [ ] CodeX
+- [ ] Mamba
+- [ ] Mamba v2
+- [ ] Mistral7B
+- [ ] RNNs are All You Need
+- [ ] AlphaCode
+- [ ] Multi-Scale Vision Longformer
+- [ ] Linformer: Self-Attention with Linear Complexity
+- [ ] Reformer: The Efficient Transformer
+- [ ] Performer: A Transformer with Linear Attention
+- [ ] Generating Long Sequences with Sparse Transformers
+
+
+## MSC
+- [ ] LoRA: Low-Rank Adaptation of Large Language Models
+- [ ] Ring Attention
