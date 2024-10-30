@@ -138,8 +138,3 @@ class GPTv2(nn.Module):
         x = self.ln_f(x)
         logits = self.clf(x)
         return logits
-
-    
-
-
-
