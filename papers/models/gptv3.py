@@ -19,24 +19,37 @@ class MultiHeadAttention(nn.Module):
     
     def forward(self, x:torch.Tensor, mask:torch.Tensor=None):
         batch_size, seq_len, d_model = x.size()
-        q = self.W_q(x)
-        k = self.W_k(x)
-        v = self.W_v(x)
+        
+        # Linear projections
+        q = self.W_q(x)  # (batch_size, seq_len, d_model)
+        k = self.W_k(x)  # (batch_size, seq_len, d_model)
+        v = self.W_v(x)  # (batch_size, seq_len, d_model)
 
-        q = q.view(batch_size, seq_len, self.n_heads, self.d_k).transpose(1,2)
-        k = k.view(batch_size, seq_len, self.n_heads, self.d_k).transpose(1,2)
-        v = v.view(batch_size, seq_len, self.n_heads, self.d_k).transpose(1,2)
+        # Reshape and transpose for attention
+        # (batch_size, n_heads, seq_len, d_k)
+        q = q.view(batch_size, seq_len, self.n_heads, self.d_k).transpose(1, 2)
+        k = k.view(batch_size, seq_len, self.n_heads, self.d_k).transpose(1, 2)
+        v = v.view(batch_size, seq_len, self.n_heads, self.d_k).transpose(1, 2)
 
-        attn_scores = torch.matmul(q, k.transpose(-2,-3)) * self.scaling_factor
+        # Compute attention scores
+        # (batch_size, n_heads, seq_len, seq_len)
+        attn_scores = torch.matmul(q, k.transpose(-2, -1)) * self.scaling_factor
         
         if mask is not None:
-            attn_scores = attn_scores.masked_fill(mask==0, float('-inf'))
+            # Expand mask for multiple heads
+            # mask shape should be (batch_size, 1, seq_len, seq_len)
+            if mask.dim() == 3:
+                mask = mask.unsqueeze(1)
+            attn_scores = attn_scores.masked_fill(mask == 0, float('-inf'))
 
         attn_weights = torch.softmax(attn_scores, dim=-1)
         attn_weights = self.dropout(attn_weights)
 
+        # (batch_size, n_heads, seq_len, d_k)
         attn_output = torch.matmul(attn_weights, v)
-        attn_output = attn_output.transpose(1,2).contiguous().view(batch_size, seq_len, d_model)
+        
+        # (batch_size, seq_len, d_model)
+        attn_output = attn_output.transpose(1, 2).contiguous().view(batch_size, seq_len, d_model)
 
         output = self.W_o(attn_output)
         return output
@@ -113,7 +126,6 @@ class FeedForwardNetwork(nn.Module):
         x = self.fc2(x)
         return x 
 
-
 class DecoderBlock(nn.Module):
     def __init__(self, d_model:int, n_heads:int, d_ff:int, window_size:int, dropout:float, use_sparse_attn:bool=False):
         super(DecoderBlock, self).__init__()
@@ -160,7 +172,14 @@ class GPTv3(nn.Module):
         self.embd_dropout = nn.Dropout(embd_pdrop)
 
         self.blocks = nn.ModuleList(
-            [DecoderBlock(d_model, n_heads, d_ff, window_size, attn_pdrop, resid_pdrop, layer_norm_epsilon) for _ in range(n_layers)])
+            [DecoderBlock(
+                d_model=d_model,
+                n_heads=n_heads,
+                d_ff=d_ff,
+                window_size=window_size,
+                dropout=attn_pdrop,
+                use_sparse_attn=False
+            ) for _ in range(n_layers)])
         
         self.ln_f = nn.LayerNorm(d_model, eps=layer_norm_epsilon)
         self.clf = nn.Linear(d_model, vocab_size, bias=False)
@@ -178,3 +197,26 @@ class GPTv3(nn.Module):
         x = self.ln_f(x)
         logits = self.clf(x)
         return logits
+
+if __name__ == "__main__":
+    # Define constants
+    VOCAB_SIZE = 1000
+    SEQ_LEN = 64
+    BATCH_SIZE = 32 
+    D_MODEL = 768
+    
+    # Create dummy input data: random token IDs within the range [0, VOCAB_SIZE-1]
+    input_ids = torch.randint(0, VOCAB_SIZE, (BATCH_SIZE, SEQ_LEN))
+    model = GPTv3(vocab_size=VOCAB_SIZE, 
+                   n_positions=SEQ_LEN, 
+                   d_model=D_MODEL, 
+                   n_layers=6, 
+                   n_heads=12, 
+                   d_ff=2048, 
+                   window_size=16, 
+                   attn_pdrop=0.1, 
+                   embd_pdrop=0.1, 
+                   resid_pdrop=0.1, 
+                   layer_norm_epsilon=1e-5)
+    logits = model(input_ids)
+    print(logits.shape)

@@ -6,7 +6,7 @@ This is my feeble attempt at reading and implementing various NLP papers. Mostly
 - [BERT](#bert)
 - [GPTv1](#gptv1)
 - [GPTv2](#gptv2)
-
+- [GPTv3](#gptv3)
 ## Transformer (Attention is All You Need)
 
 This implementation of the Transformer model follows the original architecture introduced by [Vaswani et al. (2017)](https://arxiv.org/abs/1706.03762), consisting of both **Encoder** and **Decoder** Blocks. Each encoder block contains a **Multi-Head Self-Attention** mechanism followed by a **Feed-Forward Neural Network**, with residual connections and layer normalization applied at each stage. The decoder blocks additionally include a **Cross-Attention** mechanism, which allows the model to attend to the encoder’s output while generating the target sequence. The model uses token and positional embeddings to represent input sequences, and causal masking is applied in the decoder to ensure autoregressive generation for sequence-to-sequence tasks such as machine translation.
@@ -165,3 +165,39 @@ preds = model(dummy_data)
 # Output predictions shape (should match batch size, sequence length, and vocab size)
 print(preds.shape)  # Output shape: (BATCH_SIZE, SEQ_LEN, VOCAB_SIZE)
 ```
+
+## GPTv3
+GPT-3 mostly follow GPT-2 architecture but with some modifications.Most notable change is the use of **Sparse Attention** in the decoder blocks.
+
+It has four different versions with varying parameter counts: 125M, 350M, 1.3B, and 175B parameters.
+
+<p align="center">
+  <img src="images/gptv3.png" alt="GPTv3 Architecture" width="500" height="300" />
+</p>
+
+```python
+import torch
+from models.gptv3 import GPTv3
+
+# Define constants
+VOCAB_SIZE = 1000
+SEQ_LEN = 64
+BATCH_SIZE = 32 
+D_MODEL = 768
+
+# Create dummy input data: random token IDs within the range [0, VOCAB_SIZE-1]
+input_ids = torch.randint(0, VOCAB_SIZE, (BATCH_SIZE, SEQ_LEN))
+model = GPTv3(vocab_size=VOCAB_SIZE, 
+                n_positions=SEQ_LEN, 
+                d_model=D_MODEL, 
+                n_layers=6, 
+                n_heads=12, 
+                d_ff=2048, 
+                window_size=16, 
+                attn_pdrop=0.1, 
+                embd_pdrop=0.1, 
+                resid_pdrop=0.1, 
+                layer_norm_epsilon=1e-5)
+logits = model(input_ids)
+print(logits.shape)
+  ```
